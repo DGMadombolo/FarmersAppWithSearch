@@ -1,6 +1,6 @@
 ﻿using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
-using BlobStorageWebAppMVC.Models;
+using FarmersAppWithSearch.Models;
 using Microsoft.Extensions.Options;
 
 namespace BlobStorageMVC.Services
@@ -43,9 +43,9 @@ namespace BlobStorageMVC.Services
             return blobClient.Uri.ToString();
 
         }
-        public async Task<List<VenueViewModel>> GetAllImagesAsync()
+        public async Task<List<FarmerViewModel>> GetAllImagesAsync()
         {
-            var venue = new List<VenueViewModel>();
+            var farmer = new List<FarmerViewModel>();
 
 
             var blobServiceClient = new BlobServiceClient(_setting.ConnectionString);
@@ -54,14 +54,14 @@ namespace BlobStorageMVC.Services
             await foreach (var blobItem in blobContainerClient.GetBlobsAsync())
             {
                 var blobClient = blobContainerClient.GetBlobClient(blobItem.Name);
-                venue.Add(new VenueViewModel
+                farmer.Add(new FarmerViewModel
                 {
                     Name = Path.GetFileNameWithoutExtension(blobItem.Name),
                     ImageUrl = blobClient.Uri.ToString()
                 });
             }
 
-            return venue;
+            return farmer;
 
 
         }

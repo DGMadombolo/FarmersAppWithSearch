@@ -1,7 +1,19 @@
+using FarmersAppWithSearch.Data;
+using FarmersAppWithSearch.Models;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// SQL server connection string for the database
+builder.Services.AddDbContext<ApplicationDBContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Read Azure Blob Storage settings from appsettings.json
+
+builder.Services.Configure<AzureBlobStorageSettings>(builder.Configuration.GetSection("AzureBlobStorage"));
 
 var app = builder.Build();
 
