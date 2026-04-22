@@ -56,7 +56,7 @@ namespace BlobStorageMVC.Services
                 var blobClient = blobContainerClient.GetBlobClient(blobItem.Name);
                 farmer.Add(new FarmerViewModel
                 {
-                    Name = Path.GetFileNameWithoutExtension(blobItem.Name),
+                    //Name = Path.GetFileNameWithoutExtension(blobItem.Name),
                     ImageUrl = blobClient.Uri.ToString()
                 });
             }
