@@ -26,9 +26,34 @@ namespace FarmersAppWithSearch.Controllers
         }
 
         // GET: Farmers
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString)
         {
-            return View(await _context.Farmers.ToListAsync());
+            //Get all farmers from the database
+            var allFarmers = await _context.Farmers.ToListAsync();
+
+            //If no search text, return all
+            if(string.IsNullOrEmpty(searchString))
+            {
+                return View(allFarmers);
+            }
+
+            //Create new list for filtered results
+            List<Farmer> filteredFarmers = new List<Farmer>();
+
+            //loop through farmers manually
+            foreach(var farmer in allFarmers)
+            {
+                //Check if any field contains the search text
+                if((farmer.FullName != null && farmer.FullName.Contains(searchString)) ||
+                   (farmer.FarmerCode != null && farmer.FarmerCode.Contains(searchString)) ||
+                   (farmer.FarmName != null && farmer.FarmName.Contains(searchString)) ||
+                   (farmer.Location != null && farmer.Location.Contains(searchString)))
+                {
+                    filteredFarmers.Add(farmer);
+                }
+            }
+            //return filtered list
+            return View(filteredFarmers);
         }
 
         // GET: Farmers/Details/5
