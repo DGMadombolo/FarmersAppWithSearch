@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using FarmersAppWithSearch.Data;
 using FarmersAppWithSearch.Models;
+using BlobStorageMVC.Services;
 
 namespace FarmersAppWithSearch.Controllers
 {
@@ -14,9 +15,14 @@ namespace FarmersAppWithSearch.Controllers
     {
         private readonly ApplicationDBContext _context;
 
-        public FarmersController(ApplicationDBContext context)
+        //Add Blob service
+         private readonly BlobService _blobService;
+
+        public FarmersController(ApplicationDBContext context, BlobService blobService)
+
         {
             _context = context;
+            _blobService = blobService;
         }
 
         // GET: Farmers
@@ -54,10 +60,16 @@ namespace FarmersAppWithSearch.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,FullName,FarmerCode,PhoneNumber,FarmName,Location,ImageUrl")] Farmer farmer)
+        public async Task<IActionResult> Create([Bind("Id,FullName,FarmerCode,PhoneNumber,FarmName,Location,ImageUrl")] Farmer farmer, IFormFile imageFile)
         {
             if (ModelState.IsValid)
-            {
+            {    
+                //Add if statement to handle blob image
+                if (imageFile != null && imageFile.Length > 0)
+                {
+                    farmer.ImageUrl = await _blobService.UploadImageAync(imageFile);
+                }
+
                 _context.Add(farmer);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -86,7 +98,7 @@ namespace FarmersAppWithSearch.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,FullName,FarmerCode,PhoneNumber,FarmName,Location,ImageUrl")] Farmer farmer)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,FullName,FarmerCode,PhoneNumber,FarmName,Location,ImageUrl")] Farmer farmer, IFormFile imageFile)
         {
             if (id != farmer.Id)
             {
@@ -97,6 +109,10 @@ namespace FarmersAppWithSearch.Controllers
             {
                 try
                 {
+                    if (imageFile != null && imageFile.Length > 0)
+                    {
+                        farmer.ImageUrl = await _blobService.UploadImageAync(imageFile);
+                    }
                     _context.Update(farmer);
                     await _context.SaveChangesAsync();
                 }
